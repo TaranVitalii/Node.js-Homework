@@ -1,45 +1,53 @@
 const path = require('path');	
-const readline = require('readline');	
+const readline = require('readline');
+const url = require('url');	
 const fs = require('fs');	
 const http = require('http');	
+
+const pathToFiles = path.join(__dirname,'files');
 
  // ===============================================create file in specified directory ===================================================	
 // We work with input process 	
 const rl = readline.createInterface({	
   input: process.stdin,	
   output: process.stdout,	
-  prompt: 'Hello Mentor'	
 });	
 
  rl.prompt();	
 
- rl.on('line', input =>{	
+function makeDirAndWriteFile(input){	
 	const[dirNameWithFile ,...contentFile ] = input.split(' '); //the first written part it is path, the second file it is content 	
 	const text = contentFile.join(' ');//leave spaces	
-	const pathwayDirectory = path.parse(dirNameWithFile);	
-	// make a directory	
-	fs.mkdir(pathwayDirectory.dir ,{ recursive: true }, function() {	
-		const makeDirectory = path.join(__dirname, pathwayDirectory.dir ,pathwayDirectory.base );	
-		  	fs.writeFile(makeDirectory, text , function(err) {	
-				    if(err) {	
-				        throw err;	
-				    }	
-		    console.log("The file was saved!");	
-			});	
-	});	
+	const {dir, base} = path.parse(dirNameWithFile);
+		// make a directory	
+	if(dir){
+	const pathToDir = path.join(pathToFiles, dir)
+	fs.mkdirSync(pathToDir,{ recursive: true });	
+	}	//write text in file
+	const pathToFile = dir
+	 ? path.join(pathToFiles ,dir ,base)
+	 : path.join(pathToFiles , base );
+		
+		  	fs.writeFileSync(pathToFile, text);	
 rl.close();	
-})	
+}
+
+ rl.on('line', makeDirAndWriteFile);
 // =========================================server==============================================	
-const request = (req,res)=>{	
-  const fullPath = (path.join(__dirname + req.url));//absolute file path	
-  let check = fs.existsSync(fullPath);//check the availability of documents	
+const requestHandler = (req,res)=>{	
+  const { pathname } = url.parse(req.url);//absolute file path
+  const pathToFiles = path.join(__dirname)
+  const pathToFile = path.join(pathToFiles, pathname);	
+
+  const isFileExist = fs.existsSync(pathToFile);//check the availability of documents	
   res.setHeader("Cache-control", "no-cache");	
 
-   if (check) {	
+   if (isFileExist) {	
   	//if the file is there we read it	
-  	const text = fs.readFile(fullPath,'utf-8',(error,data)=>{	
+  	fs.readFile(pathToFile,(error,data)=>{	
   		if (error){	
-  			console.error(error.message);	
+  			res.statusCode = 404;	
+  			res.end("Not found");	
   		}else{ 	
   			res.end(data);	
   		};	
@@ -52,5 +60,5 @@ const request = (req,res)=>{
 };	
 
 
- const server = http.createServer(request); 	
+ const server = http.createServer(requestHandler); 	
 server.listen(3000,()=>console.log('\nmy server is working!'));	
