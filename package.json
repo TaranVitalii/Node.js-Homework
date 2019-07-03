@@ -1,0 +1,27 @@
+{
+  "name": "1",
+  "version": "1.0.0",
+  "description": "My homework of Node.js \r Ardas\r Alexander Martyshchenko",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon streams"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikn0wQQ/Node.js-Homework.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ikn0wQQ/Node.js-Homework/issues"
+  },
+  "homepage": "https://github.com/ikn0wQQ/Node.js-Homework#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "formidable": "^1.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
+}
